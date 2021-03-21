@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% block title %}Propriétés PC{% endblock %} {% block content
+    %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <h1 align="center">Propriétés physico-chimiques</h1>
+    <p align="center">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Flask_logo.svg/langfr-1920px-Flask_logo.svg.png" alt="Flask" width="200" height="100">
+  </p>
+    <p align="justify"><b>
+      Pression de vapeur</b></p>
+      <p align="justify">
+La pression de vapeur caractérise l'aptitude d'une substance active à se volatiliser. Elle est exprimée en Pascal (Pa), autrefois en millimètres de mercure (101325 Pa = 1 atmosphère = 760 mm Hg). La température est exprimée en degrés Celsius.</p>
+<p><b>
+Constante de Henry</b></p>
+<p align="justify">
+La constante de Henry caractérise l'aptitude d'une substance active en solution à se volatiliser. Elle s'exprime en Pascal / m3 / mol. La température accompagne cette donnée.
+</p>
+<p><b>
+Solubilité dans l’eau</b></p>
+<p align="justify">
+La solubilité d'une substance dans l'eau est sa concentration de saturation dans l'eau à une température donnée. La solubilité dans l’eau est exprimée :
+
+par une valeur numérique (en g/L ou mg/L) dans l'unité la plus adéquate.
+ou bien par une appréciation qualitative choisie dans une gamme hiérarchisée (de insoluble à miscible),
+Coefficient de partage octanol/eau
+P est le coefficient de partage octanol/eau. C'est une grandeur sans dimension, définie à une température et à un pH donnés. On peut aussi l'appeler Kow. Il est souvent exprimé en logarithme décimal.
+Log P est un indicateur de liposolubilité d'une substance.
+</p>
+<p><b>
+pKa</b></p>
+<p align="justify">
+La constante de dissociation (pKa) est la constante de réaction associée à la dissociation d'un composé chimique.
+    </p>
+    <br/>
+    <br/>
+    <p align="justify center"><i>Le tableau ci-dessous contient certaines des données les plus importantes du point de vue des propriétés physico-chimiques des produits recensés Agritox. Cela permet de lister et d'indiquer précisément les caractéristiques de chacune des molécules étudiées.</i></p>
+    <nav aria-label="research-pagination">
+      <ul class="pagination">
+          {% for page in proprietespcs.iter_pages() %}
+    
+          {% if page %}
+    
+          {% if page != proprietespcs.page %}
+    
+          <li class="page-item">
+              <a class="page-link" href="{{url_for('views.proprietespc',  page=page) }}">{{page}}</a>
+          </li>
+    
+          {% else %}
+    
+          <li class="page-item active disabled">
+              <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
+          </li>
+    
+          {% endif %}
+    
+          {% else %}
+          <li class="page-item disabled">
+              <a class="page-link">...</a>
+          </li>
+    
+          {% endif %}
+    
+          {% endfor %}
+    
+      </ul>
+    </nav>
+    <form method="post">
+      <input type="text" name="searchTerm">
+      <input type="submit" value="Search" name="searchForm">
+    </form>
+    <table id="proprietespc" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Numéro de cas</th>
+            <th>Propriété associée</th>
+            <th>Valeur</th>
+            <th>Unité</th>
+            <th>Températures (°C)</th>
+          </tr>
+        </thead>
+        <tr>
+          <form method="post">
+          <input type="text" name="numcas">
+          <input type="text" name="propriete">
+          <input type="text" name="valeur">
+          <input type="text" name="unite">
+          <input type="text" name="temperatures">
+          <input type="submit" value="Create" name="createForm">
+          </form>
+        </tr>
+      {% for proprietespc in proprietespcs.items %}
+        <tbody>
+          <tr>
+
+            <form method="post">
+              <td><input type="hidden" value="{{ proprietespc.id }}" name="proprietespc_to_update">{{ proprietespc.id }}</td>
+              <td><input type="text" value="{{ proprietespc.numcas}}" name="numcas"/></td>
+              <td><input type="text" value="{{ proprietespc.propriete}}" name="propriete"/></td>
+              <td><input type="text" value="{{ proprietespc.valeur}}" name="valeur"/></td>
+              <td><input type="text" value="{{ proprietespc.unite}}" name="unite"/></td>
+              <td><input type="text" value="{{ proprietespc.temperatures}}" name="temperatures"/></td>
+              <td><input type="submit" value="Edit" name="editForm" style="background-color:rgb(23, 231, 23)"></td>
+            </form>
+        
+          <td>
+            <form method="post">
+            <input type="hidden" value="{{ proprietespc.id }}" name="proprietespc_to_delete" />
+            <input type="submit" value="Delete" name="deleteForm" style="background-color:red"/>
+          </form>
+          </td>
+          </tr>
+        </tbody>
+      {% endfor %}
+    </table>
+    {% endblock %}

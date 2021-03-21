@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% block title %}Ecotoxicite{% endblock %} {% block content
+    %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <h1 align="center">Ecotoxicité</h1>
+    <p align="center">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Flask_logo.svg/langfr-1920px-Flask_logo.svg.png" alt="Flask" width="200" height="100">
+  </p>
+    <p><b>Concentration sans effet prévisible pour les organismes aquatiques : PNEC</b></p>
+      <p align="justify">La Concentration sans Effet Prévisible (PNEC, Predicted Non Effect Concentration en anglais) est la valeur toxique de référence utilisée pour évaluer les risques pour les organismes aquatiques.
+      La PNEC désigne la concentration pour, ou en-dessous, de laquelle il n'est pas attendu d'effet sur l'ensemble des organismes aquatiques.
+      </p>
+    <p align="justify">La PNEC est déterminée en prenant en compte l'ensemble des données de toxicité sur les organismes aquatiques issues du dossier européen de la substance active et de ses métabolites, et des dossiers d’Autorisation de Mise sur le Marché (AMM) ; elle couvre les effets potentiels de la substance active et de ses métabolites pertinents pour l’évaluation du risque pour les organismes aquatiques. </p><p align="justify">Elle est exprimée en µg par litre, ou en µg par kg de sédiment.</p>
+    <p align="justify">
+      Lorsque la PNEC est définie sur la base d'études standards, elle est calculée à partir des données de toxicité aigüe (CL50 ou CE50 pour les poissons et invertébrés aquatiques, respectivement), à court terme (CE50 pour les algues et les plantes) ou à long terme (CSEO pour les poissons et invertébrés aquatiques) sur différents groupes taxonomiques et d'un facteur de sécurité (FS) de 100 (étude de toxicité aigüe) et de 10 (étude de toxicité à court terme et à long terme). </p><p align="justify">Le facteur de sécurité permet de tenir compte de la variabilité intra et inter espèces.
+    </p>
+    <p align="justify">
+      Si la PNEC est basée sur des études de niveau supérieur (microcosmes, mésocosmes), la valeur du facteur de sécurité approprié est déterminée selon la qualité de l'information fournie et la nature des effets (1 à 5).</p>
+      <p align="justify">
+      • La CL50 est la Concentration Létale pour 50% des organismes exposés, les poissons ainsi que quelques invertébrés aquatiques.</p>
+      <p align="justify">
+      • La CE50 est la Concentration d'Effet pour 50% des organismes exposés, les daphnies et quelques autres invertébrés aquatiques, les algues et les plantes aquatiques. Pour les invertébrés, l'effet est l'immobilisation. Pour les algues et plantes, sont mesurés les effets sur la biomasse (b), le taux de croissance (r) ou la densité de fronde (df) (exemple : CEr50).</p>
+      <p align="justify">
+      • La CSEO est la Concentration Sans Effet Observé pour la totalité des organismes exposés (NOEC en anglais).</p>
+      <p align="justify">
+      • En cas d'évaluation probabiliste, une HC5 (Hazard Concentration) est déterminée : c'est la concentration limite pour laquelle 5% des organismes sont affectés (exemple de critère : 5% des organismes ont une CL50 inférieure à la HC5). Un facteur de sécurité (FS) approprié prenant en compte les recommandations du document guide aquatique est appliqué à cette valeur de HC5.</p>
+    </p>
+    <br/>
+    <br/>
+    <p align="justify center"><i>Le tableau ci-dessous contient certaines des données les plus importantes du point de vue de l'écotoxicité des produits recensés Agritox. Cela permet de lister et d'indiquer précisément les caractéristiques de chacune des molécules étudiées.</i></p>
+    <br/>
+    <br/>
+    <nav aria-label="research-pagination">
+      <ul class="pagination">
+          {% for page in ecotoxicites.iter_pages() %}
+    
+          {% if page %}
+    
+          {% if page != ecotoxicites.page %}
+    
+          <li class="page-item">
+              <a class="page-link" href="{{url_for('views.ecotoxicite',  page=page) }}">{{page}}</a>
+          </li>
+    
+          {% else %}
+    
+          <li class="page-item active disabled">
+              <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
+          </li>
+    
+          {% endif %}
+    
+          {% else %}
+          <li class="page-item disabled">
+              <a class="page-link">...</a>
+          </li>
+    
+          {% endif %}
+    
+          {% endfor %}
+    
+      </ul>
+    </nav>
+    <form method="post">
+      <input type="text" name="searchTerm">
+      <input type="submit" value="Search" name="searchForm">
+    </form>
+    <table id="ecotoxicite" style="width: 100%;">
+        <tr>
+            <th>Id</th>
+            <th>Numero de cas</th>
+            <th>Nom SA</th>
+            <th>Valeur PNEC</th>
+            <th>Unité</th>
+            <th>Etude SE</th>
+        </tr>
+        <tr>
+          <form method="post">
+          <input type="text" name="numcas">
+          <input type="text" name="nomsa">
+          <input type="text" name="valpnec">
+          <input type="text" name="unite">
+          <input type="text" name="etudese">
+          <input type="submit" value="Create" name="createForm">
+          </form>
+        </tr>
+      {% for ecotoxicite in ecotoxicites.items %}
+        <tr>
+
+            <form method="post">
+              <td><input type="hidden" value="{{ ecotoxicite.id }}" name="ecotoxicite_to_update">{{ ecotoxicite.id }}</td>
+              <td><input type="text" value="{{ ecotoxicite.numcas}}" name="numcas"/></td>
+              <td><input type="text" value="{{ ecotoxicite.nomsa}}" name="nomsa"/></td>
+              <td><input type="text" value="{{ ecotoxicite.valpnec}}" name="valpnec"/></td>
+              <td><input type="text" value="{{ ecotoxicite.unite}}" name="unite"/></td>
+              <td><input type="text" value="{{ ecotoxicite.etudese}}" name="etudese"/></td>
+              <td><input type="submit" value="Edit" name="editForm" style="background-color:rgb(23,231,23)"></td>
+            </form>
+            <td><form method="post">
+              <input type="hidden" value="{{ ecotoxicite.id }}" name="ecotoxicite_to_delete" />
+              <input type="submit" value="Delete" name="deleteForm" style="background-color:red"/>
+            </form></td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% endblock %}
