@@ -1,26 +1,26 @@
 import csv, sqlite3, os
 from os import path
 
-#tout d'abord, je crée le fichier où doit se trouver la database en vérifiant notamment si elle n'existe déjà pas
+#Je crée le fichier où doit se trouver la database en vérifiant notamment si elle n'existe pas déjà
 if not path.exists("./database/"):
     os.mkdir("./database/")
 
-# l'objectif du programme est de créer une base de données appelées "agritox.db" dans le fichier "database". Ensuite, je regarde si la base existe deja ou pas. Si elle existe, ca passe. Si elle n'existe pas, elle va en créer une à partir des fichiers csv déposés dans le dossier "csvfile"
-with sqlite3.connect("./database/agritox.db") as conn: #je crée une variable "conn" qui est la connexion de ma base SQLite. A noter que la fonction connect crée automatiquement la base si elle n'existe pas
+# l'objectif du programme est de créer une base de données appelées "agritox.db" dans le fichier "database". Ensuite, je regarde si la base existe deja. Si elle existe, le programme se déroule. Si elle n'existe pas, l'application va créer une base à partir des fichiers csv déposés dans le dossier "csvfile"
+with sqlite3.connect("./database/agritox.db") as conn: #je crée une variable "conn" qui est la connexion de ma base SQLite. La fonction connect crée automatiquement la base si elle n'existe pas.
     cursor = conn.cursor() #permet de créer des requêtes SQLite
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';") #requête SQL permettant de checkez si la base possède déjà des tables
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';") #requête SQL permettant de vérifier si la base possède déjà des tables
     if cursor.fetchall() == [] : #la fonction .fetchall permet de lister toutes les tables de la db sous forme d'une liste. S'il n'y a pas de tables, c'est que la base est vide
         files = os.listdir("./csvfile/") #initie une variable comme chemin de fichiers pour boucler dessus
         for file in files:
             arborescence = "./csvfile/" #une variable permettant de reconstruire l'arborescence pour boucler sur les fichiers csv
             if file.endswith(".csv"): #ajoute une sécurité pour récupérer uniquement les fichiers csv
                 table = file.replace(".csv", "") #je crée une variable "table" qui est le nom donné à chaque table créée dans la base à partir du nom de chaque fichier csv
-                with open(arborescence + file, newline='') as f: #j'ouvre chacun fichier csv
+                with open(arborescence + file, newline='') as f: #j'ouvre chaque fichier csv
                     reader = csv.reader(f, delimiter = ";")
-                    entete = next(reader) #la fonction next permet ici de récupérer la première ligne de chaque fichier csv où se trouvent les en-têtes
-                    nombre_colonne = len(entete) #je récupère le nombre de colonnes, cela me servira à initialiser chaque table
-                    colonnes = ', '.join(entete) #je transforme la liste des en-têtes en une string que je manipulerai pour l'intégrer dans ma requête SQLite
-                    #les 3 prochaines lignes servent à nettoyer la string pour être acceptable dans une requête SQLite
+                    entete = next(reader) #la fonction next permet de récupérer la première ligne de chaque fichier csv où se trouvent les en-têtes
+                    nombre_colonne = len(entete) #je récupère le nombre de colonnes, cela servira à initialiser chaque table
+                    colonnes = ', '.join(entete) #je transforme la liste des en-têtes en une chaine str que je manipulerai pour l'intégrer dans ma requête SQLite
+                    #les 3 prochaines lignes servent à nettoyer la chaine str
                     colonnes = colonnes.replace("  ", "")
                     colonnes = colonnes.replace(" ,", ",")
                     colonnes = colonnes.replace("/", "_") #le slash cause une erreur en SQL
