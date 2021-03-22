@@ -19,4 +19,6 @@ Ensuite, si la base de données n'existait pas avant, il va :
 
 Le programme peut être lancé en boucle puisqu'un système conditionnel permet de ne pas le lancer si la base de données existait déjà et est déjà remplie.
 
+## Rajout du fichier test.py ##
 
+Le fichier test.py crée la base de données test.db qui contient uniquement une partie des données d'Agritox correspondant à trois tables. Je me suis servi de cette dernière pour la mise en forme de l'application.
