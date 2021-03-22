@@ -21,4 +21,4 @@ Le programme peut être lancé en boucle puisqu'un système conditionnel permet 
 
 ## Rajout du fichier test.py ##
 
-Le fichier test.py crée la base de données test.db qui contient uniquement une partie des données d'Agritox correspondant à trois tables. Je me suis servi de cette dernière pour la mise en forme de l'application.
+Le fichier test.py crée la base de données test.db à l'intérieur du dossier website qui contient uniquement une partie des données d'Agritox correspondant à trois tables. Je me suis servi de cette dernière pour la mise en forme de l'application.
