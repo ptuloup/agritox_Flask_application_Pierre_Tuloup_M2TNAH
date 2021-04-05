@@ -2,6 +2,7 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
+# On configure les tables SQL présentes dans la base de données pour pouvoir ensuite les traiter.
 
 class Note(db.Model):
     __tablename__ = 'Note'

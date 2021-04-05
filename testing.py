@@ -5,7 +5,7 @@ from website.models import User, Note, Classement, Ecotoxicite, Proprietespc
 
 from website import create_app, db
 
-class MyTest(TestCase): 
+class MyTest(TestCase): # On initialise un test qui crée, configure et supprime les données d'une base.
 
     SQLALCHEMY_DATABASE_URI = "sqlite:///unittests.db"
     TESTING = True
@@ -30,8 +30,8 @@ class SomeTest(MyTest):
 
     def test_something(self):
         user = User()
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user) # test d'ajout d'utilisateur à la base de données.
+        db.session.commit() # Enregistrement des modifications.
 
         # this works
         assert user in db.session

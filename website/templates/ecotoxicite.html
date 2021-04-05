@@ -67,6 +67,14 @@
       <input type="text" name="searchTerm">
       <input type="submit" value="Search" name="searchForm">
     </form>
+
+<br/>
+<tr>
+  <td>
+    Les cases suivantes correspondent avec les cinq colonnes du tableau ci-dessous, dans l'ordre indiqué.<br/>
+  </td>
+</tr>
+<br/>
     <table id="ecotoxicite" style="width: 100%;">
         <tr>
             <th>Id</th>
@@ -76,6 +84,7 @@
             <th>Unité</th>
             <th>Etude SE</th>
         </tr>
+        {% if user.is_authenticated %}
         <tr>
           <form method="post">
           <input type="text" name="numcas">
@@ -86,9 +95,10 @@
           <input type="submit" value="Create" name="createForm">
           </form>
         </tr>
+        {% endif %}
       {% for ecotoxicite in ecotoxicites.items %}
         <tr>
-
+          {% if user.is_authenticated %}
             <form method="post">
               <td><input type="hidden" value="{{ ecotoxicite.id }}" name="ecotoxicite_to_update">{{ ecotoxicite.id }}</td>
               <td><input type="text" value="{{ ecotoxicite.numcas}}" name="numcas"/></td>
@@ -96,12 +106,20 @@
               <td><input type="text" value="{{ ecotoxicite.valpnec}}" name="valpnec"/></td>
               <td><input type="text" value="{{ ecotoxicite.unite}}" name="unite"/></td>
               <td><input type="text" value="{{ ecotoxicite.etudese}}" name="etudese"/></td>
-              <td><input type="submit" value="Edit" name="editForm" style="background-color:rgb(23,231,23)"></td>
+              <td><input type="submit" value="Edit" name="editForm" style="background-color:#808080 ; color:white"></td>
             </form>
             <td><form method="post">
               <input type="hidden" value="{{ ecotoxicite.id }}" name="ecotoxicite_to_delete" />
-              <input type="submit" value="Delete" name="deleteForm" style="background-color:red"/>
+              <input type="submit" value="Delete" name="deleteForm" style="background-color:black ; color:white"/>
             </form></td>
+            {% else %}
+            <td>{{ ecotoxicite.id }}</td>
+            <td>{{ ecotoxicite.numcas }}</td>
+            <td>{{ ecotoxicite.nomsa }}</td>
+            <td>{{ ecotoxicite.valpnec }}</td>
+            <td>{{ ecotoxicite.unite }}</td>
+            <td>{{ ecotoxicite.etudese }}</td>   
+            {% endif %}
         </tr>
       {% endfor %}
     </table>

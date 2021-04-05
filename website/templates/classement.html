@@ -45,10 +45,19 @@
 
   </ul>
 </nav>
+
 <form method="post">
   <input type="text" name="searchTerm">
   <input type="submit" value="Search" name="searchForm">
 </form>
+
+<br/>
+<tr>
+  <td>
+    Les cases suivantes correspondent avec les quatre colonnes du tableau ci-dessous, dans l'ordre indiqué.<br/>
+  </td>
+</tr>
+<br/>
 <table id="classement" style="width: 100%;">
   <thead>
   <tr>
@@ -58,8 +67,10 @@
     <th>Classement par catégorie de danger</th>
     <th>Classement par code H</th>
   </tr>
+  <br/>
   </thead>
   <tbody>
+    {% if user.is_authenticated %}
   <tr>
     <form method="post">
     <input type="text" name="numcas">
@@ -67,25 +78,35 @@
     <input type="text" name="classcatdanger">
     <input type="text" name="classcodeh">
     <input type="submit" value="Create" name="createForm">
+    
     </form>
   </tr>
+    {% endif %} 
   {% for classement in classements.items %}
   <tr>
-
+    {% if user.is_authenticated %}
     <form method="post">
       <td><input type="hidden" value="{{ classement.id }}" name="classement_to_update">{{ classement.id }}</td>
       <td><input type="text" value="{{ classement.numcas}}" name="numcas"/></td>
       <td><input type="text" value="{{ classement.classdate}}" name="classdate"/></td>
       <td><input type="text" value="{{ classement.classcatdanger}}" name="classcatdanger"/></td>
       <td><input type="text" value="{{ classement.classcodeh}}" name="classcodeh"/></td>
-      <td><input type="submit" value="Edit" name="editForm" style="background-color:rgb(23,231,23)"></td>
+      <td><input type="submit" value="Edit" name="editForm" style="background-color:#808080 ; color:white"></td>
     </form>
+
     <td>
       <form method="post">
         <input type="hidden" value="{{ classement.id }}" name="classement_to_delete" />
-        <input type="submit" value="Delete" name="deleteForm" style="background-color:red"/>
+        <input type="submit" value="Delete" name="deleteForm" style="background-color:black ; color:white"/>
         </form>
     </td>
+    {% else %}
+    <td>{{ classement.id }}</td>
+    <td>{{ classement.numcas }}</td>
+    <td>{{ classement.classdate }}</td>
+    <td>{{ classement.classcatdanger }}</td>
+    <td>{{ classement.classcodeh }}</td>
+    {% endif %}
   </tr>
   </tbody>
   {% endfor %}
