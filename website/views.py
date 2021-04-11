@@ -47,7 +47,6 @@ def classement(): # Définition de la fonction classement
     print(request.method) # Etapes de debug pour voir jusqu'où va le code avant une éventuelle erreur (corrigée depuis)
     if session['searchTerm']: 
         print("truc2") # Etapes de debug
-        print(session['searchTerm']) # Etapes de debug
         print("truc") # Etapes de debug
         searchTerm = session['searchTerm'] # On fait correspondre notre recherche directement dans la base de données.
     if request.method == 'POST': # Si la méthode est un POST
