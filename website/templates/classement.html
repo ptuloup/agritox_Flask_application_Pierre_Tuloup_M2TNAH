@@ -1,115 +1,102 @@
-{% extends "base.html" %} {% block title %}Classement{% endblock %} {% block content
-%}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% extends "base.html" %}
+
+{% block title %}Classement{% endblock %}
+
+{% block content %}
 <div class="container">
-<h1 align="center">Classement</h1>
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Flask_logo.svg/langfr-1920px-Flask_logo.svg.png" alt="Flask" width="200" height="100">
-</p>
-<p align="justify">Le classement et l'étiquetage harmonisés sont proposés par l’ECHA lors de l’évaluation par les paires et publiés au Journal officiel de l’Union européenne (adaptations au Règlement européen (CE) N° 1272/2008
-  Le règlement (CE) N°1272/2008 (ou CLP) reprend en partie les éléments (étiquetage et critères) du système de classification international : le système général harmonisé (GHS). Il remplace l’ancien système de classification pour les substances actives (remplacement de la directive 67/548/CEE).</p>
-<br/>
-<br/>
-<p align="justify center"><i>Le tableau ci-dessous contient certaines des données des plus importantes du point de vue du classement des molécules des produits recensés Agritox. Cela permet de lister et d'indiquer précisément les caractéristiques de chacune des molécules étudiées.</i></p>
-<nav aria-label="research-pagination">
-  <ul class="pagination">
-      {% for page in classements.iter_pages() %}
-
-      {% if page %}
-
-      {% if page != classements.page %}
-
-      <li class="page-item">
-          <a class="page-link" href="{{url_for('views.classement',  page=page) }}">{{page}}</a>
-      </li>
-
-      {% else %}
-
-      <li class="page-item active disabled">
-          <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
-      </li>
-
-      {% endif %}
-
-      {% else %}
-      <li class="page-item disabled">
-          <a class="page-link">...</a>
-      </li>
-
-      {% endif %}
-
-      {% endfor %}
-
-  </ul>
-</nav>
-
-<form method="post">
-  <input type="text" name="searchTerm">
-  <input type="submit" value="Search" name="searchForm">
-</form>
-
-<br/>
-<tr>
-  <td>
-    Les cases suivantes correspondent avec les quatre colonnes du tableau ci-dessous, dans l'ordre indiqué.<br/>
-  </td>
-</tr>
-<br/>
-<table id="classement" style="width: 100%;">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Numero de cas</th>
-    <th>Classement par date</th>
-    <th>Classement par catégorie de danger</th>
-    <th>Classement par code H</th>
-  </tr>
+  <h1 align="center">Classement</h1>
+  <p align="center">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Flask_logo.svg/langfr-1920px-Flask_logo.svg.png" alt="Flask" width="200" height="100" />
+  </p>
+  <p align="justify">Le classement et l'étiquetage harmonisés sont proposés par l’ECHA lors de l’évaluation par les paires et publiés au Journal officiel de l’Union européenne (adaptations au Règlement européen (CE) N° 1272/2008
+    Le règlement (CE) N°1272/2008 (ou CLP) reprend en partie les éléments (étiquetage et critères) du système de classification international : le système général harmonisé (GHS). Il remplace l’ancien système de classification pour les substances actives (remplacement de la directive 67/548/CEE).</p>
   <br/>
-  </thead>
-  <tbody>
-    {% if user.is_authenticated %}
-  <tr>
-    <form method="post">
-    <input type="text" name="numcas">
-    <input type="text" name="classdate">
-    <input type="text" name="classcatdanger">
-    <input type="text" name="classcodeh">
-    <input type="submit" value="Create" name="createForm">
-    
-    </form>
-  </tr>
-    {% endif %} 
-  {% for classement in classements.items %}
-  <tr>
-    {% if user.is_authenticated %}
-    <form method="post">
-      <td><input type="hidden" value="{{ classement.id }}" name="classement_to_update">{{ classement.id }}</td>
-      <td><input type="text" value="{{ classement.numcas}}" name="numcas"/></td>
-      <td><input type="text" value="{{ classement.classdate}}" name="classdate"/></td>
-      <td><input type="text" value="{{ classement.classcatdanger}}" name="classcatdanger"/></td>
-      <td><input type="text" value="{{ classement.classcodeh}}" name="classcodeh"/></td>
-      <td><input type="submit" value="Edit" name="editForm" style="background-color:#808080 ; color:white"></td>
-    </form>
+  <br/>
+  <p align="justify center"><i>Le tableau ci-dessous contient certaines des données des plus importantes du point de vue du classement des molécules des produits recensés Agritox. Cela permet de lister et d'indiquer précisément les caractéristiques de chacune des molécules étudiées.</i></p>
 
-    <td>
-      <form method="post">
-        <input type="hidden" value="{{ classement.id }}" name="classement_to_delete" />
-        <input type="submit" value="Delete" name="deleteForm" style="background-color:black ; color:white"/>
-        </form>
-    </td>
-    {% else %}
-    <td>{{ classement.id }}</td>
-    <td>{{ classement.numcas }}</td>
-    <td>{{ classement.classdate }}</td>
-    <td>{{ classement.classcatdanger }}</td>
-    <td>{{ classement.classcodeh }}</td>
-    {% endif %}
-  </tr>
-  </tbody>
-  {% endfor %}
-</table>
+  <nav aria-label="research-pagination">
+    <ul class="pagination">
+        {% for page in classements.iter_pages() %}
+          {% if page %}
+            {% if page != classements.page %}
+              <li class="page-item">
+                  <a class="page-link" href="{{url_for('views.classement',  page=page, searchTerm=searchTerm or '') }}">{{page}}</a>
+              </li>
+            {% else %}
+              <li class="page-item active disabled">
+                  <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
+              </li>
+            {% endif %}
+          {% else %}
+            <li class="page-item disabled">
+                <a class="page-link">...</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+    </ul>
+  </nav>
+
+  <form method="GET" action="{{url_for('.classement')}}">
+    <input type="text" name="searchTerm" placeholder="Terme de votre recherche" value="{{searchTerm}}" />
+    <input type="submit" value="Search" name="searchForm">
+  </form>
+
+  <br/>
+  <p>
+    Les cases suivantes correspondent avec les quatre colonnes du tableau ci-dessous, dans l'ordre indiqué.<br/>
+  </p>
+
+  <table id="classement" style="width: 100%;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Numero de cas</th>
+        <th>Classement par date</th>
+        <th>Classement par catégorie de danger</th>
+        <th>Classement par code H</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if user.is_authenticated %}
+        <tr>
+          <form method="post">
+          <input type="text" name="numcas">
+          <input type="text" name="classdate">
+          <input type="text" name="classcatdanger">
+          <input type="text" name="classcodeh">
+          <input type="submit" value="Create" name="createForm">
+          
+          </form>
+        </tr>
+      {% endif %} 
+    {% for classement in classements.items %}
+      <tr>
+        {% if user.is_authenticated %}
+          <form method="post">
+            <td><input type="hidden" value="{{ classement.id }}" name="classement_to_update">{{ classement.id }}</td>
+            <td><input type="text" value="{{ classement.numcas}}" name="numcas"/></td>
+            <td><input type="text" value="{{ classement.classdate}}" name="classdate"/></td>
+            <td><input type="text" value="{{ classement.classcatdanger}}" name="classcatdanger"/></td>
+            <td><input type="text" value="{{ classement.classcodeh}}" name="classcodeh"/></td>
+            <td><input type="submit" value="Edit" name="editForm" style="background-color:#808080 ; color:white"></td>
+          </form>
+          <td>
+            <form method="post">
+              <input type="hidden" value="{{ classement.id }}" name="classement_to_delete" />
+              <input type="submit" value="Delete" name="deleteForm" style="background-color:black ; color:white"/>
+              </form>
+          </td>
+        {% else %}
+          <td>{{ classement.id }}</td>
+          <td>{{ classement.numcas }}</td>
+          <td>{{ classement.classdate }}</td>
+          <td>{{ classement.classcatdanger }}</td>
+          <td>{{ classement.classcodeh }}</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}
