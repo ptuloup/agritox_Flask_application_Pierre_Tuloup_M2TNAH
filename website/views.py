@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, url_for, session
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, session, redirect
 from sqlalchemy import or_
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -39,86 +39,93 @@ def delete_note(): # Initialisation de la fonction delete_note
 
     return jsonify({})
 
+
 # Pour les routes suivantes, qui correspondent aux tables affichées dans ma base, j'ai procédé par étape et ai fait le choix de garder certaines étapes de construction, notamment certaines lignes print pour les debug ainsi que des parties commentées de code qui m'ont servi pour optimiser l'écriture finale.
-@views.route('/classement', methods=['GET', 'POST']) # Route pour la table Classement
-def classement(): # Définition de la fonction classement
-    DONNEES_PAR_PAGES = 15 # On affiche pour chaque table 15 lignes à la fois, la pagination servant à faire défiler plus facilement les données.
-    searchTerm = None # La fonction Search est initialisée
-    print(request.method) # Etapes de debug pour voir jusqu'où va le code avant une éventuelle erreur (corrigée depuis)
-    if session['searchTerm']: 
-        print("truc2") # Etapes de debug
-        print("truc") # Etapes de debug
-        searchTerm = session['searchTerm'] # On fait correspondre notre recherche directement dans la base de données.
-    if request.method == 'POST': # Si la méthode est un POST
-        print("test") # Etapes de debug
-        print(request.form) # Etapes de debug
-        print("test2") # Etapes de debug
-        if 'searchForm' in request.form: # Si la méthode searchForm fait partie de request.form
-            print('search for') # Etapes de debug
-            searchTerm = request.form['searchTerm'] # On fait correspondre notre recherche directement dans la base de données
-            print(searchTerm) # Etapes de debug
-            searchTerm = "%{}%".format(searchTerm) # On applique un formatage au résultat de la recherche
-            session['searchTerm'] = searchTerm # On enregistre la recherche avec l'outil session dans la base de données
 
-    page = request.args.get("page", 1) # On affiche alors les pages correspondant aux résultats de la recherche
+@views.route('/classement', methods=['GET', 'POST']) 
+def classement():
+    DONNEES_PAR_PAGES = 15 
+    searchTerm = None
 
-    if isinstance(page, str) and page.isdigit(): # Si la recherche correspond, on affiche les numéros des pages correspondant aux différents résultats de la recherche.
-        page = int(page) # Le numéro de page est un entier
+    # En cas de méthode GET, il est possible d'avoir un élément de recherche
+    #   On le récupère pour la recherche plus tard.
+    if request.method == 'GET':
+        searchTerm = request.args.get("searchTerm", type=str)
+    
+    # Récupération de la page dans les paramètres, avec un défaut de 1 et en integer.
+    page = request.args.get("page", 1, int)
+
+    if searchTerm is not None:
+        # Si il y a une recherche, on filtre la recherche 
+        #   sur l'ensemble des colonnes du tableau Classement 
+        #   avec la méthode query.filter ainsi que la méthode 
+        #   ilike qui prend en compte chaque colonne.
+        classements = Classement.query.filter(
+            or_(
+                Classement.numcas.ilike("%{}%".format(searchTerm)),
+                Classement.classcatdanger.ilike("%{}%".format(searchTerm)),
+                Classement.classcodeh.ilike("%{}%".format(searchTerm))
+            )
+        )
     else:
-        page = 1 # Sinon, n'afficher que la première page
-    classements = None # On interroge ensuite la table Classement
-    print(searchTerm) # Etape de debug, visible dans le terminal
-    if searchTerm is not None: # Si le mot recherché existe, on filtre la recherche sur l'ensemble des colonnes du tableau Classement avec la méthode query.filter ainsi que la méthode ilike qui prend en compte chaque colonne. On garde également la pagination des résultats.
-        classements = Classement.query.filter(or_(Classement.numcas.ilike(searchTerm), Classement.classcatdanger.ilike(searchTerm), Classement.classcodeh.ilike(searchTerm))).paginate(
-            page=page,
-            per_page=DONNEES_PAR_PAGES            
-        )
-    else: # Si ce n'est pas le cas, on laisse affiché l'ensemble des données de la table
-        classements = Classement.query.paginate(
-            page=page,
-            per_page=DONNEES_PAR_PAGES
-        )
-    print('before') # Etapes de debug (terminal)
-    if request.method == 'POST': # Si la méthode est un POST
-        
-        print('post') # Debug
-        """ if 'searchForm' in request.form:
-            
-            print('search for')
-            search_term = request.form['searchTerm']
-            print(search_term)
-            search_term = "%{}%".format(search_term)
-            classements = Classement.query.filter(Classement.numcas.ilike(search_term)).paginate(
-                page=page,
-                per_page=DONNEES_PAR_PAGES
+        # Si ce n'est pas le cas, on laisse affiché l'ensemble des données de la table
+        classements = Classement.query
+
+    # La pagination est appliquée sur la query filtrée ou brute, pour éviter
+    #    une répétition
+    classements = classements.paginate(
+        page=page,
+        per_page=DONNEES_PAR_PAGES
     )
-            print(classements.items) """
-        if current_user.is_authenticated: # Et si l'utilisateur est connecté
-            if 'deleteForm' in request.form: # Si la méthode CRUD Delete existe
-                Classement.query.filter(Classement.id == request.form['classement_to_delete']).delete() # On l'utilise pour supprimer les données d'une ligne de la table Classement
-                db.session.commit() # On enregistre ensuite cette modification dans la base de données
-                flash('You deleted data successfully!', category='success') # On affiche le message suivant avec succès
-                return redirect(url_for('classement')) # On renvoie à la page Classement de l'application
-            elif 'editForm' in request.form: # Cette méthode sert à modifier les données de la base et à la mettre à jour
+
+    # Ci-dessous, on gère les situations où l'utilisateur propose des modifications à la base
+    #    de données.
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+
+            if 'deleteForm' in request.form:
+                # On l'utilise pour supprimer les données d'une ligne de la table Classement
+                Classement.query.filter(Classement.id == request.form['classement_to_delete']).delete() 
+                db.session.commit()
+                flash('You deleted data successfully!', category='success')
+
+                return redirect(url_for('.classement')) 
+
+            elif 'editForm' in request.form: 
+                # Cette méthode sert à modifier les données de la base et à la mettre à jour
                 Classement.query.filter(Classement.id == request.form['classement_to_update']).update({
                     Classement.numcas: request.form['numcas'],
                     Classement.classdate: request.form['classdate'],
                     Classement.classcatdanger: request.form['classcatdanger'],
                     Classement.classcodeh: request.form['classcodeh'],
                     })
-                db.session.commit() # On enregistre ensuite la modification dans la base de données
-                flash('You edited data successfully!', category='success') # On affiche le message suivant avec succès
+                db.session.commit() 
+                flash('You edited data successfully!', category='success')
 
-                
-            elif 'createForm' in request.form: # Cette méthode permet de créer de nouvelles données dans la base de données
-                new_classement = Classement(numcas=request.form['numcas'], classdate=request.form['classdate'], classcatdanger=request.form['classcatdanger'], classcodeh=request.form['classcodeh']) # La création de nouvelles données se fait par ajout de celles-ci dans les cases correspondant au nombre de colonnes, et dans l'ordre indiqué par le tableau.
-                db.session.add(new_classement) # On ajoute les modification dans la base de données
-                db.session.commit() # On enregistre
-                flash('You created new data successfully!', category='success') # On affiche le message suivant avec succès
-        else :
-            flash('You must be authenticated', category='error') # Ces fonctionnalités ne sont permises uniquement si l'utilisateur est enregistré.
+                return redirect(url_for('.classement')) 
 
-    return render_template('classement.html', user=current_user, classements=classements) # On renvoie à la page html Classement
+            elif 'createForm' in request.form:
+                # Cette méthode permet de créer de nouvelles données dans la base de données
+                new_classement = Classement(
+                    numcas=request.form['numcas'],
+                    classdate=request.form['classdate'],
+                    classcatdanger=request.form['classcatdanger'],
+                    classcodeh=request.form['classcodeh']
+                ) 
+                db.session.add(new_classement)
+                db.session.commit()
+                flash('You created new data successfully!', category='success') 
+
+                return redirect(url_for('.classement')) 
+
+            else:
+                flash('You must be authenticated', category='error') # Ces fonctionnalités ne sont permises uniquement si l'utilisateur est enregistré.
+
+    return render_template('classement.html', 
+        user=current_user, 
+        classements=classements,
+        searchTerm=searchTerm or ""
+    ) 
 
 # Les mêmes étapes que précédemment s'appliquent pour la route de la table Ecotoxicite
 @views.route('/ecotoxicite', methods=['GET', 'POST']) # On initialise la route
